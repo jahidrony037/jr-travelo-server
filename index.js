@@ -6,7 +6,7 @@ const port = process.env.PORT || 5000;
 
 // middleware 
 app.use(cors());
-app.use(express());
+app.use(express.json());
 
 
 
@@ -29,10 +29,17 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
 
-    
+    const touristSpotCollections= client.db("touristSpotsDB").collection("touristSpots");
 
 
 
+    app.post('/addTouristSpot', async(req, res) => {
+        const touristSpot = req.body;
+        // console.log(spot);
+        const result = await touristSpotCollections.insertOne(touristSpot);
+        res.send(result);
+
+    })
 
 
 
