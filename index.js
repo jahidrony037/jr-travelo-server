@@ -1,4 +1,5 @@
 const express = require('express');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors')
 const app = express();
 require('dotenv').config();
@@ -12,8 +13,9 @@ app.use(express.json());
 
 
 // database connect
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@atlascluster.k7qynmg.mongodb.net/?retryWrites=true&w=majority&appName=AtlasCluster`;
+const uri = "mongodb://localhost:27017";
+
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@atlascluster.k7qynmg.mongodb.net/?retryWrites=true&w=majority&appName=AtlasCluster`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -41,13 +43,29 @@ async function run() {
 
     })
 
-    //get all tourist spots added by user
+    //get all tourist spots added by user (for user List)
     app.get('/touristSpots/:email', async(req, res)=>{
         const email = req.params.email;
         const query = {'email': email};
         const result = await touristSpotCollections.find(query).toArray();
         res.send(result);
 
+    })
+
+    //delete tourist spot by user api
+    app.delete('/touristSpots/:id', async(req, res)=>{
+        const id = req.params.id;
+        const query = {'_id': new ObjectId(id)};
+        const result = await touristSpotCollections.deleteOne(query);
+        res.send(result);
+    })
+
+    //update a tourist spot by user api
+
+    //all tourist spot get api 
+    app.get('/allTouristSpots', async(req,res)=>{
+      const result = await touristSpotCollections.find().toArray();
+      res.send(result); 
     })
 
 
