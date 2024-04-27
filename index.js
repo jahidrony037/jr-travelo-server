@@ -32,11 +32,20 @@ async function run() {
     const touristSpotCollections= client.db("touristSpotsDB").collection("touristSpots");
 
 
-
+    //create new tourist spot api 
     app.post('/addTouristSpot', async(req, res) => {
         const touristSpot = req.body;
         // console.log(spot);
         const result = await touristSpotCollections.insertOne(touristSpot);
+        res.send(result);
+
+    })
+
+    //get all tourist spots added by user
+    app.get('/touristSpots/:email', async(req, res)=>{
+        const email = req.params.email;
+        const query = {'email': email};
+        const result = await touristSpotCollections.find(query).toArray();
         res.send(result);
 
     })
