@@ -60,7 +60,39 @@ async function run() {
         res.send(result);
     })
 
-    //update a tourist spot by user api
+    //get a single tourist spot api
+    app.get('/allTouristSpots/:id', async(req, res)=>{
+      const id = req.params.id;
+      const query = {"_id": new ObjectId(id)};
+      const result = await touristSpotCollections.findOne(query);
+      res.send(result);
+    })
+    //update a single tourist spot by user api
+    app.put('/allTouristSpots/:id', async(req,res)=>{
+      const id=req.params.id;
+      const touristSpot = req.body;
+      console.log(touristSpot);
+      const query={"_id":new ObjectId(id)};
+      const options = { upsert: true };
+      const updateTouristSpot = {
+        $set:{
+              photoUrl:touristSpot.photoUrl,
+              seasonality:touristSpot.seasonality,
+              touristSpotName:touristSpot.touristSpotName,
+              countryName:touristSpot.countryName,
+              location:touristSpot.location,
+              description:touristSpot.description,
+              averageCost:touristSpot.averageCost,
+              travelTime:touristSpot.travelTime,
+              totalVisitorsPerYear:touristSpot.totalVisitorsPerYear, 
+        }
+      }
+
+      const result = await touristSpotCollections.updateOne(query,updateTouristSpot,options);
+      console.log(result);
+      res.send(result);
+    })
+
 
     //all tourist spot get api 
     app.get('/allTouristSpots', async(req,res)=>{
