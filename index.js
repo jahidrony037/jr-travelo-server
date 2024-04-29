@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 
 // {origin:["http://localhost:5173","https://jr-travelo-server.vercel.app"]}
 // middleware 
-app.use (cors());
+app.use (cors({origin:["http://localhost:5173","https://jr-travelo.web.app","https://jr-travelo-server.vercel.app"]}));
 app.use(express.json());
 
 
@@ -34,12 +34,13 @@ async function run() {
     // await client.connect();
 
     const touristSpotCollections= client.db("touristSpotsDB").collection("touristSpots");
+    const subCategoryCollections= client.db("touristSpotsDB").collection("subCatagories");
 
 
     //create new tourist spot api 
     app.post('/addTouristSpot', async(req, res) => {
         const touristSpot = req.body;
-        // console.log(spot);
+        // console.log(touristSpot);
         const result = await touristSpotCollections.insertOne(touristSpot);
         res.send(result);
 
@@ -72,8 +73,9 @@ async function run() {
     //update a single tourist spot by user api
     app.put('/allTouristSpots/:id', async(req,res)=>{
       const id=req.params.id;
+      // console.log(id);
       const touristSpot = req.body;
-      console.log(touristSpot);
+      // console.log("line 77",touristSpot);
       const query={"_id":new ObjectId(id)};
       const options = { upsert: true };
       const updateTouristSpot = {
@@ -91,7 +93,6 @@ async function run() {
       }
 
       const result = await touristSpotCollections.updateOne(query,updateTouristSpot,options);
-      console.log(result);
       res.send(result);
     })
 
@@ -100,6 +101,28 @@ async function run() {
     app.get('/allTouristSpots', async(req,res)=>{
       const result = await touristSpotCollections.find().toArray();
       res.send(result); 
+    })
+
+    //all subCategory get api
+    app.get('/subCategories', async(req,res)=>{
+      const result = await subCategoryCollections.find().toArray();
+      res.send(result);
+    })
+    
+
+    //specific subCategory load api
+    app.get('/subCategories/:countryName', async(req,res)=>{
+      const countryName = req.params.countryName;
+      const query = {"countryName": countryName};
+      const result = await touristSpotCollections.find(query).toArray();
+      res.send(result);
+    })
+
+    app.get('/subCategories/:countryName/:id', async(req, res)=>{
+      const id= req.params.id;
+      const query={"_id":new ObjectId(id)};
+      const result = await touristSpotCollections.findOne(query);
+      res.send(result);
     })
 
 
