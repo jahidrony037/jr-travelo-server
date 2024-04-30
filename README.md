@@ -1,7 +1,5 @@
 # JR TRAVELO SERVER
 
-Live Site URL: ['https://jr-travelo.web.app/']
-
 ## All TOURIST API
 
 - all tourist-spot: ['https://jr-travelo-server.vercel.app/allTouristSpots']
