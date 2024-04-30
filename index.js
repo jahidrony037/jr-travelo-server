@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId, Int32 } = require('mongodb');
 const cors = require('cors')
 const app = express();
 require('dotenv').config();
@@ -39,8 +39,21 @@ async function run() {
 
     //create new tourist spot api 
     app.post('/addTouristSpot', async(req, res) => {
-        const touristSpot = req.body;
+        const cursor = req.body;
         // console.log(touristSpot);
+        const touristSpot= {
+              email:cursor.email,
+              userName:cursor.userName,
+              photoUrl:cursor.photoUrl,
+              seasonality:cursor.seasonality,
+              touristSpotName:cursor.touristSpotName,
+              countryName:cursor.countryName,
+              location:cursor.location,
+              description:cursor.description,
+              averageCost:new Int32(cursor.averageCost),
+              travelTime:cursor.travelTime,
+              totalVisitorsPerYear:cursor.totalVisitorsPerYear,
+        }
         const result = await touristSpotCollections.insertOne(touristSpot);
         res.send(result);
 
@@ -49,7 +62,8 @@ async function run() {
     //get all tourist spots added by user (for user List)
     app.get('/touristSpots/:email', async(req, res)=>{
         const email = req.params.email;
-        const query = {'email': email};
+        // console.log("line 65",typeof email);
+        const query = {email: email};
         const result = await touristSpotCollections.find(query).toArray();
         res.send(result);
 
@@ -58,7 +72,7 @@ async function run() {
     //delete tourist spot by user api
     app.delete('/touristSpots/:id', async(req, res)=>{
         const id = req.params.id;
-        const query = {'_id': new ObjectId(id)};
+        const query = {_id: new ObjectId(id)};
         const result = await touristSpotCollections.deleteOne(query);
         res.send(result);
     })
@@ -66,7 +80,8 @@ async function run() {
     //get a single tourist spot api
     app.get('/allTouristSpots/:id', async(req, res)=>{
       const id = req.params.id;
-      const query = {"_id": new ObjectId(id)};
+      // console.log("line 82", typeof id);
+      const query = {_id: new ObjectId(id)};
       const result = await touristSpotCollections.findOne(query);
       res.send(result);
     })
@@ -76,7 +91,7 @@ async function run() {
       // console.log(id);
       const touristSpot = req.body;
       // console.log("line 77",touristSpot);
-      const query={"_id":new ObjectId(id)};
+      const query={_id:new ObjectId(id)};
       const options = { upsert: true };
       const updateTouristSpot = {
         $set:{
@@ -86,7 +101,7 @@ async function run() {
               countryName:touristSpot.countryName,
               location:touristSpot.location,
               description:touristSpot.description,
-              averageCost:touristSpot.averageCost,
+              averageCost:new Int32(touristSpot.averageCost),
               travelTime:touristSpot.travelTime,
               totalVisitorsPerYear:touristSpot.totalVisitorsPerYear, 
         }
@@ -113,16 +128,24 @@ async function run() {
     //specific subCategory load api
     app.get('/subCategories/:countryName', async(req,res)=>{
       const countryName = req.params.countryName;
-      const query = {"countryName": countryName};
+      // console.log(countryName, typeof countryName);
+      const query = {countryName: countryName};
       const result = await touristSpotCollections.find(query).toArray();
       res.send(result);
     })
 
     app.get('/subCategories/:countryName/:id', async(req, res)=>{
       const id= req.params.id;
-      const query={"_id":new ObjectId(id)};
+      // console.log("line 138", typeof id, id);
+      const query={_id:new ObjectId(id)};
       const result = await touristSpotCollections.findOne(query);
       res.send(result);
+    })
+
+    // for sorting api
+    app.get('/allTouristSpot/sort', async(req,res)=>{
+        const sortedData = await touristSpotCollections.find().sort({averageCost:1}).toArray();
+        res.send(sortedData);
     })
 
 
